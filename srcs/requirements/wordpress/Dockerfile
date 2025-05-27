@@ -15,7 +15,7 @@ RUN curl -k -o /tmp/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/
 RUN mkdir -p /run/php /var/www/inception
 
 # Copy configuration files
-COPY ./conf/www.conf /etc/php/8.1/fpm/pool.d/
+COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/
 
 # Copy and set up the setup script
 COPY ./tools/setup.sh /usr/local/bin/
