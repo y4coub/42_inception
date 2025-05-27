@@ -1,4 +1,4 @@
-DOCKER_CMD = docker compose
+DOCKER_CMD = docker compose -f srcs/docker-compose.yml
 STORAGE_ROOT = /home/yaharkat/data
 W_VOLUME = $(STORAGE_ROOT)/wordpress
 D_VOLUME = $(STORAGE_ROOT)/mariadb
@@ -8,25 +8,25 @@ D_VOLUME = $(STORAGE_ROOT)/mariadb
 all: up
 
 initialize_volumes:
-	@echo "initializing directories..."
+	@echo "Initializing directories..."
 	mkdir -p $(W_VOLUME)
 	mkdir -p $(D_VOLUME)
 	@echo "✅ Storage directories ready"
 
 up: initialize_volumes
-	@echo "uping application stack..."
+	@echo "Starting application stack..."
 	$(DOCKER_CMD) up --build -d
 	@echo "✅ All services are now running"
 
 down:
-	@echo " containers..."
+	@echo "Stopping containers..."
 	$(DOCKER_CMD) down
 	@echo "✅ All containers stopped"
 
 reboot: down up
 
 log:
-	@echo " live logs (Ctrl+C to exit)..."
+	@echo "Showing live logs (Ctrl+C to exit)..."
 	$(DOCKER_CMD) logs -f
 
 clean:
@@ -35,10 +35,11 @@ clean:
 	docker volume prune -f
 	docker network prune -f
 	docker image prune -f
-	@echo "✅ clean completed"
+	@echo "✅ Cleanup completed"
 
 fclean: clean
 	@echo "⚠️  Purging all persistent data..."
+	docker stop $(docker ps -aq) 2>/dev/null; docker rm $(docker ps -aq) 2>/dev/null; docker rmi $(docker images -q) 2>/dev/null; docker volume rm $(docker volume ls -q) 2>/dev/null; docker system prune -a --volumes -f
 	rm -rf $(W_VOLUME)/*
 	rm -rf $(D_VOLUME)/*
 	@echo "✅ Data purge completed"
