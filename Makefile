@@ -1,4 +1,5 @@
 COMPOSE = docker compose -f srcs/docker-compose.yml
+USER=yaharkat
 DATA_DIR = /home/${USER}/data
 W_VOLUME = ${DATA_DIR}/wordpress
 D_VOLUME = ${DATA_DIR}/mariadb
