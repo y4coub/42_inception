@@ -14,4 +14,6 @@ COPY conf/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 443
 
+WORKDIR /var/www/inception
+
 CMD ["nginx", "-g", "daemon off;"]

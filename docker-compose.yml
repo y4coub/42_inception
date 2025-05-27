@@ -3,8 +3,6 @@ services:
     build: ./srcs/requirements/mariadb
     container_name: mariadb
     env_file: ./srcs/.env
-    ports:
-      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     restart: on-failure
@@ -15,10 +13,8 @@ services:
     build: ./srcs/requirements/wordpress
     container_name: wordpress
     env_file: ./srcs/.env
-    ports:
-      - "9000:80"
     volumes:
-      - wp_files:/var/www/html
+      - wp_files:/var/www/inception
     depends_on:
       - mariadb
     restart: on-failure
@@ -34,7 +30,7 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - wp_files:/var/www/html:ro
+      - wp_files:/var/www/inception
     restart: on-failure
     networks:
       - inception_net

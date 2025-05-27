@@ -2,8 +2,8 @@ FROM debian:bookworm
 
 # Install dependencies in a single layer with proper cleanup
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    php php-mysql wget php8.2-fpm php-curl curl netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/* \
+    php php-mysql wget php8.2-fpm php-curl curl netcat-openbsd ca-certificates && \
+    update-ca-certificates && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 # Install WP-CLI with verification
