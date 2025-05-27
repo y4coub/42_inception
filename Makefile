@@ -1,47 +1,42 @@
-DOCKER_CMD = docker compose -f srcs/docker-compose.yml
-STORAGE_ROOT = /home/yaharkat/data
-W_VOLUME = $(STORAGE_ROOT)/wordpress
-D_VOLUME = $(STORAGE_ROOT)/mariadb
-
-.PHONY: default initialize_volumes build up down reboot log clean fclean re
+COMPOSE = docker compose -f srcs/docker-compose.yml
+DATA_DIR = /home/${USER}/data
+W_VOLUME = ${DATA_DIR}/wordpress
+D_VOLUME = ${DATA_DIR}/mariadb
 
 all: up
 
-initialize_volumes:
-	@echo "Initializing directories..."
-	mkdir -p $(W_VOLUME)
-	mkdir -p $(D_VOLUME)
-	@echo "✅ Storage directories ready"
+init:
+	@mkdir -p ${W_VOLUME} ${D_VOLUME}
+	@echo "✅ Volumes initialized at ${DATA_DIR}"
 
-up: initialize_volumes
-	@echo "Starting application stack..."
-	$(DOCKER_CMD) up --build -d
-	@echo "✅ All services are now running"
+up: init
+	@echo "🚀 Starting containers..."
+	${COMPOSE} up --build -d
+	@echo "✅ All services are up!"
 
 down:
-	@echo "Stopping containers..."
-	$(DOCKER_CMD) down
-	@echo "✅ All containers stopped"
+	@echo "🛑 Stopping containers..."
+	${COMPOSE} down
+	@echo "✅ Containers stopped"
 
-reboot: down up
+re: down up
 
-log:
-	@echo "Showing live logs (Ctrl+C to exit)..."
-	$(DOCKER_CMD) logs -f
+logs:
+	@${COMPOSE} logs -f
 
 clean:
-	@echo "Cleaning up unused Docker resources..."
+	@echo "🧹 Cleaning Docker system..."
 	docker system prune -f
 	docker volume prune -f
 	docker network prune -f
-	docker image prune -f
-	@echo "✅ Cleanup completed"
+	@echo "✅ Docker cleaned"
 
-fclean: clean
-	@echo "⚠️  Purging all persistent data..."
-	docker stop $(docker ps -aq) 2>/dev/null; docker rm $(docker ps -aq) 2>/dev/null; docker rmi $(docker images -q) 2>/dev/null; docker volume rm $(docker volume ls -q) 2>/dev/null; docker system prune -a --volumes -f
-	rm -rf $(W_VOLUME)/*
-	rm -rf $(D_VOLUME)/*
-	@echo "✅ Data purge completed"
+fclean: down
+	@echo "⚠️ Removing all data volumes and images..."
+	rm -rf ${W_VOLUME} ${D_VOLUME}
+	docker rmi $$(docker images -q) 2>/dev/null || true
+	docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	docker network rm $$(docker network ls -q) 2>/dev/null || true
+	@echo "✅ Project fully cleaned"
 
-re: fclean all
+.PHONY: all init up down re logs clean fclean
